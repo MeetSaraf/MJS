@@ -1,6 +1,4 @@
-"""
-    Server - Handles all the connections from client and attach a clientresponse to every connection.
-"""
+
 import socket
 import threading
 import pandas as pd
