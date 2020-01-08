@@ -1,7 +1,3 @@
-"""
-    Class -  Client Handler.
-    Used pandas dataframe to save sessions.
-"""
 
 from shutil import rmtree
 import os
