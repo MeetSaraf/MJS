@@ -140,4 +140,43 @@
         rmtree(user_path)
         return "\nDeleted user with username " + user + " successfully"
         
-        heloo
+    def get_directories(self):
+        """
+            Get a list of directories of logged in user.
+
+            Return : list
+                List of files
+        """
+        total = []
+        for directiries, files, sub in os.walk(os.path.join("data", self.username)):
+            total.append(os.path.normpath(os.path.realpath(direc)))
+        return total
+
+    def file_info(self, directory):
+        """
+            Returns file info of a file.
+
+            Return : list
+                list of [filename, size, date modified]
+        """
+        list_file = []
+        for i in os.listdir(directory):
+            a = os.stat(os.path.join(directory, i))
+            list_file.append([i, str(a.st_size), str(time.ctime(a.st_ctime))])
+        return list_file
+
+    def list(self):
+        """
+            Returns a list of files and folder in current directory.
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        total_data = self.file_info(os.path.join("data", self.username, self.client_directory))
+        response = "\nFile | Size | Date modified\n"
+        for data in total_data:
+            oneline = " | ".join([data[0], data[1], data[2]]) + "\n"
+            response += "~~~~~~\n" + oneline
+        return response
