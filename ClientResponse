@@ -180,3 +180,86 @@
             oneline = " | ".join([data[0], data[1], data[2]]) + "\n"
             response += "~~~~~~\n" + oneline
         return response
+        
+    def reset_read_file(self):
+        """
+            Reset the saved read index of all the files.
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        for path in list(self.read_file_index.keys()):
+            self.read_file_index[path] = 0
+        return "\nReseted the index of all read_file."
+
+    def read_file(self, path):
+        """
+            Returns the data of specified file.
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        total_files = []
+        for file in os.listdir(os.path.join("data", self.username, self.client_directory)):
+            if os.path.isfile(os.path.join("data", self.username, self.client_directory, file)):
+                total_files.append(file)
+        if path not in total_files:
+            return "\nFile not found."
+        total_path = os.path.join("data", self.username, self.client_directory, path)
+        if total_path not in list(self.read_file_index.keys()):
+            self.read_file_index[total_path] = 0
+        with open(total_path, "r") as file:
+            contents = file.read()
+        old_index = str(self.read_file_index[total_path]*self.char_count)
+        index = self.read_file_index[total_path]
+        data = contents[index*self.char_count:(index+1)*self.char_count]
+        self.read_file_index[total_path] += 1
+        self.read_file_index[total_path] %= len(contents)//self.char_count + 1
+        return "\n" + "Command - read_file from " + old_index + " to " + str(int(old_index)+self.char_count) + " are - \n" + data
+
+    def write_file(self, path, write_data):
+        """
+            Writes data to specified file.
+            If file is absent, new file will be written.
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        total_path = os.path.join("data", self.username, self.client_directory, path)
+        total_files = []
+        for file in os.listdir(os.path.join("data", self.username, self.client_directory)):
+            if os.path.isfile(os.path.join("data", self.username, self.client_directory, file)):
+                total_files.append(file)
+        if path in total_files:
+            with open(total_path, "a+") as file:
+                write_data = "\n" + write_data
+                file.write(write_data)
+            return "\nSuccess."
+        with open(total_path, "w+") as file:
+            file.write(write_data)
+        return "\nSuccess."
+
+    def create_folder(self, path):
+        """
+            Create a new folder of specified name
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        current_dir = os.path.join("data", self.username, self.client_directory)
+        available_dirs = []
+        for sub in os.listdir(current_dir):
+            if os.path.isdir(os.path.join(current_dir, sub)):
+                available_dirs.append(sub)
+        if path in available_dirs:
+            return "\nDirectory Already Present"
+        os.mkdir(os.path.join(current_dir, path))
+        return "\nSuccess."
