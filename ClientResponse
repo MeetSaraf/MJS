@@ -244,3 +244,39 @@
         with open(total_path, "w+") as file:
             file.write(write_data)
         return "\nSuccess."
+        
+     def create_folder(self, path):
+        """
+            Create a new folder of specified name
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        current_dir = os.path.join("data", self.username, self.client_directory)
+        available_dirs = []
+        for sub in os.listdir(current_dir):
+            if os.path.isdir(os.path.join(current_dir, sub)):
+                available_dirs.append(sub)
+        if path in available_dirs:
+            return "\nDirectory Already Present"
+        os.mkdir(os.path.join(current_dir, path))
+        return "\nSuccess."
+        
+     def change_folder(self, directory):
+        """
+            Change folder to specified folder.
+
+            Return : str
+                Response
+        """
+        if not self.is_login:
+            return "\nCan you login first?"
+        total_dir = self.get_directories()
+        path_to_be_change = os.path.join("data", self.username, self.client_directory, directory)
+        path_to_be_change = os.path.normpath(os.path.realpath(path_to_be_change))
+        if path_to_be_change in total_dir:
+            self.client_directory = os.path.join(self.client_directory, directory)
+            return "\nChanged directory to " + directory + " successfully"
+        return "\nWrong directory name."
