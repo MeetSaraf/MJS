@@ -1,0 +1,141 @@
+   def __init__(self):
+        """
+            Initialize variables
+        """
+        self.username = None
+        self.is_login = False
+        self.login_session_data = None
+        self.logged_users = None
+        self.load_session_data()
+        self.client_directory = None
+        self.read_file_index = {}
+   
+    def login_valid(self, user):
+        """
+            Set login as valid for user.
+        """
+        self.is_login = True
+        self.username = user
+        self.client_directory = ""
+        temp = pd.DataFrame(columns=['username'])
+        temp['username'] = [user]
+        self.logged_users = self.logged_users.append(temp)
+        self.logged_users.to_csv("serverSession/loginUsers.csv", index=False)
+
+
+    def get_password(self, user):
+        """
+            Get password from session data for user.
+
+            Return : str
+                password of user
+        """
+        return str(self.login_session_data.loc[self.login_session_data['username'] == user, 'password'].iloc[0])
+
+
+    def login(self, user, password):
+        """
+            Login
+
+            Return : str
+                response
+        """
+        self.load_session_data()
+        if self.is_login:
+            return "\nAlready logged in"
+        if user not in self.login_session_data['username'].tolist():
+            return "\nUsername not registered"
+        if password != self.get_password(user):
+            return "\nWrong password!"
+        if user in self.logged_users['username'].tolist():
+            return "\nLogged in from different IP"
+        self.login_valid(user)
+        return "\nLogin completed."
+
+    def quit(self):
+        """
+            Quit command.
+
+            Return : str
+                Response
+        """
+        try:
+            if self.username in self.logged_users['username'].tolist():
+                temp_list = self.logged_users['username'].tolist().remove(self.username)
+                self.logged_users['username'] = temp_list
+                self.logged_users.to_csv("serverSession/loginUsers.csv", index=False)
+            self.client_directory = ""
+            self.is_login = False
+            self.username = None
+            self.read_file_index = {}
+            return "\nSigned out"
+        except KeyError:
+            return "\nSigned out"
+
+
+    def register(self, user, password, privileges):
+        """
+            Registers a new user by saving its data in server session.
+
+            Return : str
+                Response
+        """
+        if user in self.login_session_data['username'].tolist():
+            return "\nUsername not available"
+        if user == "" or password == "" or privileges == "":
+            return "\nYou cannot register empty user"
+        temp = pd.DataFrame(columns=['username'])
+        temp['username'] = [user]
+        temp['password'] = password
+        if privileges.lower() == 'admin':
+            temp['isAdmin'] = 1
+        else:
+            temp['isAdmin'] = 0
+        self.login_session_data = self.login_session_data.append(temp)
+        self.login_session_data.to_csv("serverSession/users.csv", index=False)
+        self.load_session_data()
+        os.mkdir(os.path.join("data", user))
+        return "\nRegistered user successfully."
+
+    def get_privilege(self, username):
+        """
+            Get privileges of user.
+
+            Return : int
+                1 if user is admin , else 0.
+        """
+        return int(self.login_session_data.loc[self.login_session_data['username'] == username, 'isAdmin'].iloc[0])
+
+    def delete(self, user, password):
+        """
+            Delete user from the server database.
+            If user is logged in from other machine, he/she will be logged out.
+            If user if self, then it logs out self too.
+
+            Return : str
+                Response
+        """
+        self.load_session_data()
+        if not self.is_login:
+            return "\nYou need to login."
+        if self.get_privilege(self.username) != 1:
+            return "\nYou should be admin."
+        if user not in self.login_session_data['username'].tolist():
+            return "\nNo user with username " + user + " found"
+        if password != self.get_password(self.username):
+            return "\nYou have entered wrong password"
+        temp = pd.DataFrame(columns=['username', 'password', 'isAdmin'])
+        for user_loop, pass_loop, privi_loop in zip(self.login_session_data['username'].tolist(), self.login_session_data['password'].tolist(), self.login_session_data['isAdmin'].tolist()):
+            if user_loop != user:
+                temp2 = pd.DataFrame(columns=['username', 'password', 'isAdmin'])
+                temp2['username'] = [user_loop]
+                temp2['password'] = pass_loop
+                temp2['isAdmin'] = privi_loop
+                temp = temp.append(temp2)
+        temp.to_csv("serverSession/users.csv", index=False)
+        self.load_session_data()
+        if user == self.username:
+            self.quit()
+        user_path = os.path.join("data", user)
+        rmtree(user_path)
+        return "\nDeleted user with username " + user + " successfully"
