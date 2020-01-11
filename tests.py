@@ -69,3 +69,76 @@ class ClientResponseClassTestingStepTwo(unittest.TestCase):
 
         self.assertListEqual([results[0]], expected_results)
         self.assertIn("testfolder1", results[1])
+        
+     class ClientResponseClassTestingStepOne(unittest.TestCase):
+    """Handles the test for command and quit response"""
+
+    def test_commands_response(self):
+        """
+        This test will check whether ClientResponse responds commands.
+        """
+
+        test_class = ClientResponse()
+
+        output = test_class.commands()
+
+        test_class.quit()
+        reset_login()
+
+        self.assertTrue(output)
+
+    def test_commands_quit(self):
+        """
+        This test will check quit response.
+        """
+        expected_results = ["\nSigned out"]
+        results = []
+
+        test_class = ClientResponse()
+
+        results.append(test_class.quit())
+        reset_login()
+
+        self.assertListEqual(results, expected_results)
+
+class ClientResponseClassTestingStepThree(unittest.TestCase):
+    """Handles the tests to check response for change folder and create folder"""
+
+    def test_ClientResponse_change_folder(self):
+        """
+        This test will check response for change folder.
+        Test1 : Change folder without login.
+        Test2 : Wrong directory change.
+        Test3 : Proper directory change.
+        """
+        results = []
+        expected_results = ["\nCan you login first?", "\nWrong directory name.", "\nChanged directory to testfolder1 successfully"]
+        test_class = ClientResponse()
+        test_class.login_session_data = init_login()
+        results.append(test_class.change_folder("testfolder1"))
+        test_class.login("test", "123")
+        results.append(test_class.change_folder("testfolder2"))
+        results.append(test_class.change_folder("testfolder1"))
+        test_class.quit()
+        reset_login()
+
+        self.assertListEqual(results, expected_results)
+
+    def test_ClientResponse_create_folder(self):
+        """
+        This test will check response for create folder.
+        Test1 : Create already present directory.
+        Test2 : Proper directory with random name.
+        """
+        results = []
+        expected_results = ["\nDirectory Already Present", "\nSuccess."]
+        test_class = ClientResponse()
+        test_class.login_session_data = init_login()
+        test_class.login("test", "123")
+        results.append(test_class.create_folder("testfolder1"))
+        test_class.change_folder("testfolder1")
+        results.append(test_class.create_folder("test" + random_folder()))
+        test_class.quit()
+        reset_login()
+
+        self.assertListEqual(results, expected_results)
