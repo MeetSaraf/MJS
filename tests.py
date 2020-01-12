@@ -206,3 +206,26 @@ class ClientResponseClassTestingStepThree(unittest.TestCase):
             return False
 
         return result.wasSuccessful()
+    
+    
+def is_finished_with_step_one():
+    """Run the first batch of tests"""
+    print('-'*70 + "\nStarting test suite 1:\n")
+    return is_finished_with_step(ClientResponseClassTestingStepOne)
+
+def is_finished_with_step_two():
+    """Run the second batch of tests"""
+    print('-'*70 + "\nStarting test suite 2:\n")
+    return is_finished_with_step(ClientResponseClassTestingStepTwo)
+
+def is_finished_with_step_three():
+    """Run the second batch of tests"""
+    print('-'*70 + "\nStarting test suite 3:\n")
+    return is_finished_with_step(ClientResponseClassTestingStepThree)
+
+def is_finished_with_step_four():
+    """Run the second batch of tests"""
+    print('-'*70 + "\nStarting test suite 4:\n")
+    return is_finished_with_step(ClientResponseClassTestingStepFour)
+
+
