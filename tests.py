@@ -168,7 +168,7 @@ class ClientResponseClassTestingStepThree(unittest.TestCase):
         
         
         
-       def test_ClientResponse_write_file(self):
+     def test_ClientResponse_write_file(self):
         """
         This test will check write file.
         Test1 : Write on non existing file.
@@ -186,3 +186,23 @@ class ClientResponseClassTestingStepThree(unittest.TestCase):
         reset_login()
 
         self.assertListEqual(results, expected_results)
+        
+        
+     def is_finished_with_step(test_case_class_to_use):
+        """Helper function to initialize, load, and run tests"""
+        loader = unittest.TestLoader()
+        suite = unittest.TestSuite()
+
+        suite.addTests(
+              loader.loadTestsFromTestCase(
+                   test_case_class_to_use
+              )
+        )
+
+        runner = unittest.TextTestRunner(verbosity=2)
+        result = runner.run(suite)
+
+        if result.skipped:
+            return False
+
+        return result.wasSuccessful()
