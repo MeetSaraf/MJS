@@ -142,3 +142,26 @@ class ClientResponseClassTestingStepThree(unittest.TestCase):
         reset_login()
 
         self.assertListEqual(results, expected_results)
+        
+        
+        class ClientResponseClassTestingStepFour(unittest.TestCase):
+    """Handles the final part of the tests inculting tests for read and write the files"""
+
+    def test_ClientResponse_read_file(self):
+        """
+        This test will check read file.
+        Test1 : Read the non existing file.
+        Test2 : Proper read file.
+        """
+        results = []
+        expected_results = ["\nFile not found.", "\nCommand - read_file from 0 to 100 are - \nDontChangeThisContent"]
+        test_class = ClientResponse()
+        test_class.login_session_data = init_login()
+        test_class.login("test", "123")
+        test_class.change_folder("testfolder1")
+        results.append(test_class.read_file("test_read2.txt"))
+        results.append(test_class.read_file("test_read.txt"))
+        test_class.quit()
+        reset_login()
+
+        self.assertListEqual(results, expected_results)
