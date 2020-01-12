@@ -165,3 +165,24 @@ class ClientResponseClassTestingStepThree(unittest.TestCase):
         reset_login()
 
         self.assertListEqual(results, expected_results)
+        
+        
+        
+       def test_ClientResponse_write_file(self):
+        """
+        This test will check write file.
+        Test1 : Write on non existing file.
+        Test2 : Proper write file.
+        """
+        results = []
+        expected_results = ["\nSuccess.", "\nSuccess."]
+        test_class = ClientResponse()
+        test_class.login_session_data = init_login()
+        test_class.login("test", "123")
+        test_class.change_folder("testfolder1")
+        results.append(test_class.write_file(random_folder() + ".txt", "content"))
+        results.append(test_class.write_file("test_write.txt", "content"))
+        test_class.quit()
+        reset_login()
+
+        self.assertListEqual(results, expected_results)
